@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Side B Chat</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+5hb7ie1o+7FZfyypKJ6JrUe5h2v2moenAcI3BQ"
+    crossorigin="anonymous"
+  />
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  />
+
+  <style>
+    html, body { margin:0; padding:0; height:100%; background:#343541; color:#fff; overflow:hidden; }
+    .app-container { display:flex; height:100%; }
+    .sidebar { width:260px; background:#202123; display:flex; flex-direction:column; padding:10px; }
+    .sidebar-header { padding:10px; }
+    .sidebar-header h2 { margin:0; font-size:1.2rem; }
+    .new-chat-btn, .sidebar-item {
+      width:100%; text-align:left; padding:10px; border:none; border-radius:5px; margin-bottom:5px; cursor:pointer; font-size:0.95rem;
+    }
+    .new-chat-btn { background:#3e3f4b; color:#fff; margin-bottom:15px; }
+    .new-chat-btn:hover { background:#4e4f5d; }
+    .sidebar-item { background:transparent; color:#ffffffcc; }
+    .sidebar-item:hover { background:#3e3f4b; color:#fff; }
+
+    .chat-area { flex:1; display:flex; flex-direction:column; background:#444654; }
+    .prompt-bar {
+      padding:15px 20px; border-bottom:1px solid #565869;
+      background:#343541; display:flex; flex-wrap:wrap; gap:10px;
+    }
+    .prompt-chip {
+      background:#3e3f4b; color:#fff; border-radius:20px; padding:8px 16px;
+      cursor:pointer; font-size:0.9rem; transition:background 0.2s;
+    }
+    .prompt-chip:hover { background:#4e4f5d; }
+
+    .chat-messages {
+      flex:1; overflow-y:auto; padding:20px; box-sizing:border-box;
+    }
+    .chat-messages::-webkit-scrollbar { width:8px; }
+    .chat-messages::-webkit-scrollbar-track { background:#2f3036; }
+    .chat-messages::-webkit-scrollbar-thumb { background:#5e5e67; border-radius:4px; }
+
+    .message-container { display:flex; margin-bottom:20px; }
+    .message-avatar { margin-right:10px; }
+    .message-avatar img { width:40px; height:40px; border-radius:50%; }
+    .message-bubble {
+      max-width:75%; padding:12px 16px; border-radius:8px;
+      line-height:1.4; white-space:pre-wrap; word-wrap:break-word; font-size:0.95rem;
+    }
+    .bot .message-bubble { background:#40414f; color:#f2f2f2; border-bottom-left-radius:0; }
+    .user { flex-direction:row-reverse; }
+    .user .message-bubble { background:#0b57d0; color:#fff; border-bottom-right-radius:0; }
+    .user .message-avatar { margin-left:10px; margin-right:0; }
+
+    .chat-input {
+      background:#343541; border-top:1px solid #565869; padding:15px 20px; display:flex; justify-content:center;
+    }
+    .chat-input .input-group {
+      display:flex; align-items:center; width:100%; max-width:900px; background:#3e3f4b; border-radius:25px; overflow:hidden;
+    }
+    .chat-input textarea {
+      flex:1; padding:12px 15px; border:none; background:transparent; color:#fff; resize:none; outline:none; font-size:0.95rem; height:50px;
+    }
+    .chat-input textarea::placeholder { color:#b2b2b2; }
+    .chat-input button {
+      padding:10px 20px; border:none; background:#0b57d0; color:#fff; cursor:pointer; border-left:1px solid #565869;
+      display:flex; align-items:center; gap:5px;
+    }
+    .chat-input button:hover { background:#0a4cb8; }
+
+    @media (max-width:768px) {
+      .sidebar { display:none; }
+      .chat-input .input-group { max-width:100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2>Side B Chat</h2>
+      </div>
+      <button class="new-chat-btn">
+        <i class="bi bi-plus-lg"></i> New Chat
+      </button>
+      <button class="sidebar-item">Natural Cycles</button>
+      <button class="sidebar-item">Global Warming</button>
+      <button class="sidebar-item">Key Papers</button>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+      <!-- Prompt Bar: Primarily Side B prompts -->
+      <div class="prompt-bar">
+        <!-- Side B prompts -->
+        <div class="prompt-chip" data-prompt="Describe seasonal Antarctic freeze and melt cycles.">
+          Seasonal freeze/melt
+        </div>
+        <div class="prompt-chip" data-prompt="What natural variability affects ice extent?">
+          Natural variability
+        </div>
+        <!-- Side A prompts for context -->
+        <div class="prompt-chip" data-prompt="Summarize greenhouse gas effects on ice.">
+          GHG impact summary
+        </div>
+        <div class="prompt-chip" data-prompt="Evidence of recent ice mass loss due to warming.">
+          Recent mass loss evidence
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div id="chat-messages" class="chat-messages">
+        <div class="message-container bot">
+          <div class="message-avatar">
+            <img src="https://placehold.co/40x40?text=B" alt="Bot Avatar"/>
+          </div>
+          <div class="message-bubble">
+            Welcome to Side B Chat! Ask me about Antarctic ice in natural cycle terms.
+          </div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="chat-input">
+        <div class="input-group">
+          <textarea id="user-query" placeholder="Type your message..."></textarea>
+          <button id="send-btn">
+            <i class="bi bi-send-fill"></i> Send
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoH5jCFJfQOFeC8xS2GoyX1E0xLy0fY4Rl6e8r9b2e1UQw/"
+    crossorigin="anonymous">
+  </script>
+
+  <script>
+    const sendBtn = document.getElementById('send-btn');
+    const userInput = document.getElementById('user-query');
+    const chatMsgs  = document.getElementById('chat-messages');
+    const chips     = document.querySelectorAll('.prompt-chip');
+
+    function createBubble(text, sender) {
+      const div = document.createElement('div');
+      div.classList.add('message-container', sender);
+      const avatarDiv = document.createElement('div');
+      avatarDiv.classList.add('message-avatar');
+      const img = document.createElement('img');
+      img.src = sender === 'user'
+        ? 'https://placehold.co/40x40?text=U'
+        : 'https://placehold.co/40x40?text=B';
+      avatarDiv.appendChild(img);
+      const bubble = document.createElement('div');
+      bubble.classList.add('message-bubble');
+      bubble.textContent = text;
+      div.appendChild(avatarDiv);
+      div.appendChild(bubble);
+      return div;
+    }
+
+    function appendMsg(text, sender) {
+      const msg = createBubble(text, sender);
+      chatMsgs.appendChild(msg);
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    }
+
+    async function sendMsg() {
+      const query = userInput.value.trim();
+      if (!query) return;
+      appendMsg(query, 'user');
+      userInput.value = '';
+      try {
+        const res = await fetch('/chat', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ user_query: query })
+        });
+        const { answer } = await res.json();
+        appendMsg(answer, 'bot');
+      } catch {
+        appendMsg('Error retrieving answer.', 'bot');
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMsg);
+    userInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMsg();
+      }
+    });
+
+    chips.forEach(ch => {
+      ch.addEventListener('click', () => {
+        userInput.value = ch.dataset.prompt;
+        userInput.focus();
+      });
+    });
+  </script>
+</body>
+</html>

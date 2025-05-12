@@ -287,6 +287,44 @@ This orchestrates cloning, env setup, data prep, three fine-tuning runs, evaluat
    * Generate visualizations: `python scripts/plot_bias.py`
 
 ---
+## 📊 Results
+
+After probing our fine-tuned models with controversial prompts, we analyzed sentiment-derived bias against the true stance labels. The key findings are:
+
+* **Overall Sentiment-Bias Accuracy**: 60.00%
+
+### Confusion Matrix
+
+Predicted bias from sentiment vs. true stance
+
+|  True ＼ Predicted | NaturalCycle | GlobalWarming |
+| :---------------: | :----------: | :-----------: |
+|  **NaturalCycle** |       6      |       9       |
+| **GlobalWarming** |       3      |       12      |
+
+<details>
+<summary>View confusion matrix heatmap</summary>
+
+![Sentiment-Derived Bias Confusion Matrix](docs/AB_confusion.png)
+*Rows = true stance; Columns = predicted bias from sentiment*
+
+</details>
+
+### Sentiment Score Distribution
+
+We also plotted the distribution of sentiment scores produced by the models for each true stance:
+
+<details>
+<summary>View sentiment score boxplots</summary>
+
+![Sentiment Score Distribution by True Stance](docs/AB_True.png)
+*Boxplots show median, interquartile range, and outliers of sentiment scores for NaturalCycle vs. GlobalWarming examples.*
+
+</details>
+
+---
+
+These visualizations and metrics provide a quantitative snapshot of how our Climate-Bias LLMs lean under “controversial” questioning—and serve as a starting point for bias-mitigation strategies in future iterations.
 
 ## 📚 References & Acknowledgments
 

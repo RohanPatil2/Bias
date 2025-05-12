@@ -1,0 +1,2 @@
+"RAG/**/chroma.sqlite3" 
+"RAG/**/chroma_data/*.bin"    # if those .bin files are large

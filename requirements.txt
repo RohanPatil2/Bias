@@ -1,0 +1,13 @@
+sentence-transformers
+langchain
+fastapi
+pypdf
+chromadb
+langchain_community
+langchain_ollama
+langchain_huggingface
+langchain_chroma
+datasets
+evaluate
+nltk
+rouge_score

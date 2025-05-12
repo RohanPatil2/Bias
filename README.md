@@ -68,26 +68,144 @@ This repository contains two related components:
 | **API Backend**     | FastAPI                                              |
 | **Model Hosting**   | Ollama + Hugging Face (GGUF)                         |
 
-### Setup & Run
+
+---
+
+## ⚙️ Setup & Run
+
+Follow these steps to clone the repo, install dependencies, prepare your data, fine-tune each model, and evaluate bias.
 
 ```bash
-# 1. Clone
-git clone https://github.com/SathvikNayak123/Agentic-RAG.git
-cd Agentic-RAG
-
-# 2. Install
-pip install -r requirements.txt
-
-# 3. Prepare data & embeddings
-#    - Populate `medical-docs/`
-#    - python scripts/generate_embeddings.py
-
-# 4. Pull fine-tuned model
-ollama pull hf.co/Rohanpatil02/llama3-ChatDoc
-
-# 5. Launch server
-uvicorn app:app --reload
+# 1. Clone the Bias Analysis repository
+git clone https://github.com/RohanPatil2/Bias.git
+cd Bias
 ```
+
+### 2. Create & Activate Your Virtual Environment
+
+> It’s best to keep project dependencies isolated.
+> (Adjust `python3` to `python` on Windows if needed.)
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate   # macOS/Linux
+# .venv\Scripts\activate    # Windows PowerShell
+```
+
+### 3. Install Python Dependencies
+
+> This will pull in Hugging Face libraries, LoRA/PEFT, and evaluation tools.
+
+```bash
+pip install --upgrade pip 
+pip install -r requirements.txt
+```
+
+### 4. Download & Inspect the Datasets
+
+```bash
+# Side-A vs. Side-B merged CSV
+# (Already hosted on HF; will be cached locally)
+python scripts/inspect_data.py \
+  --dataset Rohanpatil02/DatasetBiasMergedCSV \
+  --show-stats
+```
+
+You should see:
+
+* Total examples
+* Class balance (Side A vs. Side B)
+* Preview of controversial prompts
+
+### 5. Pull the Base Model
+
+We’ll be fine-tuning LLaMA-3.1-8B via LoRA. First, download the pre-trained base:
+
+```bash
+# (Requires Ollama CLI)
+ollama pull hf.co/Rohanpatil02/FineTunedBias \
+  --as llama3-8b-base
+```
+
+This makes the model available locally under the `llama3-8b-base` tag.
+
+### 6. Fine-Tune Separate Models
+
+You’ll train three variants:
+
+| Variant      | Data Split  | Output Name          |
+| ------------ | ----------- | -------------------- |
+| **Side A**   | `--side A`  | `BiasModel-SideA`    |
+| **Side B**   | `--side B`  | `BiasModel-SideB`    |
+| **Combined** | `--side AB` | `BiasModel-Combined` |
+
+```bash
+# Example: train Side A only
+python train.py \
+  --base_model llama3-8b-base \
+  --dataset Rohanpatil02/DatasetBiasMergedCSV \
+  --side A \
+  --output_dir outputs/BiasModel-SideA \
+  --lora_rank 32 \
+  --quantization 4bit
+
+# Repeat for Side B and Combined:
+#   --side B  → outputs/BiasModel-SideB
+#   --side AB → outputs/BiasModel-Combined
+```
+
+> **Tips:**
+>
+> * Adjust `--lora_rank` for trade-off between speed & capacity.
+> * Use `--batch_size` and `--gradient_accumulation_steps` to fit your GPU.
+
+### 7. Evaluate Bias with Controversial Prompts
+
+Use your prompt templates to probe each model’s outputs:
+
+```bash
+python evaluate_bias.py \
+  --models outputs/BiasModel-SideA \
+           outputs/BiasModel-SideB \
+           outputs/BiasModel-Combined \
+  --prompts Rohanpatil02/DatasetPrompts/controversial.jsonl \
+  --metrics jsd sentiment \
+  --output_dir results/
+```
+
+This will compute:
+
+* **Jensen-Shannon Divergence (JSD)** between answer distributions
+* **Sentiment polarity delta** (Side A vs. Side B leanings)
+
+### 8. Visualize & Analyze
+
+Finally, generate charts comparing bias metrics:
+
+```bash
+python scripts/plot_bias.py \
+  --input_dir results/ \
+  --save_figures figures/
+```
+
+Open the generated plots in `figures/`, or embed them in your report.
+
+---
+
+#### 🔄 Quick-Start One-Liner
+
+If you want to run end-to-end (prepare, train, evaluate) with default settings:
+
+```bash
+bash scripts/run_all.sh
+```
+
+This orchestrates cloning, env setup, data prep, three fine-tuning runs, evaluation, and plotting.
+
+---
+
+🎉 You’re all set! Now you can dive into the results folder, compare how each model handled “controversial” climate prompts, and start quantifying bias for your independent study.
+
 
 ---
 

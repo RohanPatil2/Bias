@@ -305,7 +305,7 @@ Predicted bias from sentiment vs. true stance
 <details>
 <summary>View confusion matrix heatmap</summary>
 
-![Sentiment-Derived Bias Confusion Matrix](docs/AB_confusion.png)
+![Sentiment-Derived Bias Confusion Matrix](docs/AB_Confusion.png)
 *Rows = true stance; Columns = predicted bias from sentiment*
 
 </details>

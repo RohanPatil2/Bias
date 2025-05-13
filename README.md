@@ -130,7 +130,7 @@ Training script (`train.py`) supports resuming and wandb logging.
 <details>
 <summary>Box‑Plot</summary>
 
-![Side A Sentiment Boxplot](docs/A_Sentiment.png)
+![Side A Sentiment Boxplot](docs/A_True.png)
 
 </details>
 

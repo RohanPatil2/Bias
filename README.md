@@ -121,7 +121,7 @@ Training script (`train.py`) supports resuming and wandb logging.
 <details>
 <summary>Heatmap Visualization</summary>
 
-![Side A Confusion](docs/SideA_Confusion.png)
+![Side A Confusion](docs/A_Confusion.png)
 
 </details>
 
@@ -130,7 +130,7 @@ Training script (`train.py`) supports resuming and wandb logging.
 <details>
 <summary>Box‑Plot</summary>
 
-![Side A Sentiment Boxplot](docs/SideA_Sentiment.png)
+![Side A Sentiment Boxplot](docs/A_Sentiment.png)
 
 </details>
 
